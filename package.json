@@ -1,0 +1,23 @@
+{
+  "name": "calandar-js",
+  "version": "0.0.1",
+  "description": "",
+  "main": "./dist/bundle.js",
+  "scripts": {
+    "build": "webpack",
+    "serve": "http-serve ./example -c"
+  },
+  "keywords": [],
+  "author": "JayPY.Code <jaypy.code@gmail.com>",
+  "license": "MIT",
+  "dependencies": {
+    "moment-jalaali": "^0.9.1"
+  },
+  "devDependencies": {
+    "webpack": "^4.41.2",
+    "webpack-cli": "^3.3.10",
+    "typescript": "^3.6.4",
+    "ts-loader": "^6.2.1",
+    "@types/moment-jalaali": "^0.7.4"
+  }
+}

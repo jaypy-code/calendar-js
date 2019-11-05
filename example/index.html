@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <script src="../dist/bundle.js"></script>
+    <style>
+        div#calendar {
+            border: 1px solid #000;
+            width: calc(42px * 7);
+        }
+
+        div.day {
+            width: 40px;
+            height: 40px;
+            border: 1px solid #000;
+        }
+
+        div.day.disable {
+            background-color: rgba(0, 0, 0, .2);
+        }
+
+        div.day:not(.disable) {
+            cursor: pointer;
+        }
+
+        div.week {
+            display: flex;
+            flex-wrap: nowrap;
+        }
+
+        div.info {
+            text-align: left;
+            width: calc(42px * 7);
+        }
+
+        header {
+            position: fixed;
+            top: 10px;
+            left: 10px;
+            right: 10px;
+            display: flex;
+            flex-wrap: wrap;
+        }
+
+        header h3 {
+            margin-top: 0;
+        }
+
+        header select {
+            margin-left: auto;
+            height: 30px;
+        }
+
+        footer {
+            position: fixed;
+            bottom: 10px;
+            left: 10px;
+            right: 10px;
+            display: flex;
+            flex-wrap: wrap;
+        }
+
+        footer div.link {
+            margin-left: auto;
+        }
+
+        section {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        body {
+            margin: 0;
+        }
+
+        * {
+            user-select: none;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <h3>Calendar JS</h3>
+        <select id="months"></select>
+    </header>
+    <section>
+        <div id="calendar"></div>
+        <div class="info">
+            <p>Year: <span id="year"></span></p>
+            <p>Month: <span id="month"></span></p>
+            <p>Month Name: <span id="Month"></span></p>
+            <p>Weeks: <span id="weeks"></span></p>
+            <p>Last Day: <span id="length"></span></p>
+            <p id="select">You didn`t select a day.</p>
+        </div>
+    </section>
+    <footer>
+        <div class="hint">See your browser console!</div>
+        <div class="link">
+            <a id="time"></a>
+            <a href="">Source Code</a>
+        </div>
+    </footer>
+    <script>
+        let calendar = new window.Calendar('#calendar');
+
+        function makeMonths() {
+            let months = calendar.months;
+            let monthsElem = document.getElementById('months');
+            for (let i in months) {
+                let option = document.createElement('option');
+                option.innerText = months[i];
+                option.value = Number(i) + 1;
+                monthsElem.appendChild(option);
+            }
+
+            monthsElem.onchange = () => {
+                let value = monthsElem.selectedIndex + 1 || null;
+                make(null, Number(value));
+            }
+        }
+
+        function select(index = 0) {
+            if (document.querySelector('select#months option[selected]')) document.querySelector('select#months option[selected]').removeAttribute('selected');
+            document.querySelector(`select#months option[value='${index}']`).setAttribute('selected', '');
+        }
+        function callback(day) {
+            document.getElementById('select').innerText = `You selected ${day}th day of this month.`
+        }
+
+        async function make(year = null, month = null) {
+            let now = await Date.now();
+            document.getElementById('select').innerText = 'You didn`t select a day.';
+            let info = await calendar.make({ year, month }, callback)
+            console.clear();
+            console.log(info);
+            select(info['for']['month']);
+            document.getElementById('year').innerText = info['for']['year'];
+            document.getElementById('month').innerText = info['for']['month'];
+            document.getElementById('Month').innerText = info['for']['Month'];
+            document.getElementById('weeks').innerText = info['for']['weeks'];
+            document.getElementById('length').innerText = info['for']['length'];
+            document.getElementById('time').innerText = 'Build on ' + (Date.now() - now) + 'ms';
+        }
+
+        window.onload = () => {
+            makeMonths();
+            make()
+        }
+
+    </script>
+</body>
+
+</html>
