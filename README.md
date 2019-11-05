@@ -1,5 +1,5 @@
 # Calendar-JS (version 0.0.1)
-You can make simple calendar for jalaali and able to choose years and months and a event emiter when user click on a day on the calander. It is free and opensource and please improve this library. You can use [demo](https://jaypy-code.github.io/calendar-js).
+You can make simple calendar for jalaali and able to choose years and months and a event emiter when user click on a day on the calander. It is free and opensource and please improve this library. You can use [demo](https://jaypy-code.github.io/calendar-js/example/).
 
 # How to use
 First you should call calendar-js script file.
