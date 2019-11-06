@@ -1,0 +1,48 @@
+div#calendar {
+    border: 1px solid #000;
+    width: calc((var(--box) + 2px) * 7);
+}
+
+div.day {
+    width: var(--box);
+    height: var(--box);
+    border: 1px solid #000;
+}
+
+div.day.disable {
+    background-color: rgba(0, 0, 0, .2);
+}
+
+div.day:not(.disable) {
+    cursor: pointer;
+}
+
+div.day div.labels {
+    display: flex;
+    flex-wrap: nowrap;
+    overflow: hidden;
+    margin: 3px 0 0 3px;
+}
+
+div.day div.labels div.label {
+    font-size: 0.8rem;
+    padding: 3px 5px;
+    border-radius: 2rem;
+    background-color: #eee;
+    white-space: pre;
+}
+
+div.day div.labels div.label.blue {
+    color: white;
+    background-color: blue;
+}
+
+div.day div.labels div.label.red {
+    color: white;
+    background-color: red;
+}
+
+div.week {
+    display: flex;
+    flex-wrap: nowrap;
+}

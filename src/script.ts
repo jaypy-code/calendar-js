@@ -16,12 +16,20 @@ class Calendar {
         }
         this.element = element;
     }
-    async make(options = { year: null, month: null }, onSelect = (day: string) => { return day; }) {
+    async make(options: any = {
+        year: null,
+        month: null,
+        labels: { '1': [{ text: '1th', class: 'blue' }] },
+        on: {
+            day: (day: string) => { return day; },
+            label: (label: object) => { return label; }
+        }
+    }) {
         let
             months = this.months,
             currentDate = await moment().locale('fa'), // today date
             year = options['year'] || currentDate.jYear(), // today year in jalali
-            month = options['month'] || currentDate.jMonth() + 1, // today month in jalali
+            month = (options['month'] && typeof options['month']=='number' && 1 <= options['month'] && options['month'] <= 12)?options['month'] : currentDate.jMonth() + 1, // today month in jalali
             day = currentDate.jDate(), // today date in jalali
             last_day = moment(`${year}/${month}/1`, 'jYYYY/jMM/jDD').endOf('jMonth').jDate(), // 30 or 31
             start_index = moment(`${year}/${month}/1`, 'jYYYY/jMM/jDD').weekday() + 1, // first day of month start is sunday, monday or ..
@@ -29,9 +37,8 @@ class Calendar {
             weeks = 5,
             day_index = 1;
 
-        if (start_index >= 5) {
-            if (start_index == 6 && last_day >= 30) weeks = 6;
-            if (start_index == 5 && last_day == 31) weeks = 6;
+        if (start_index >= 5 && ((start_index == 6 && last_day >= 30) || (start_index == 5 && last_day == 31))) { // if first day of month start in 5th or 6th day of week change weeks in a month
+            weeks = 6;
         }
 
         let div = document.createElement('div');
@@ -68,14 +75,55 @@ class Calendar {
             return div;
         }
 
-        function createDay(day: any = '') {
+        function createDay(day: string = '') {
             let div = document.createElement('div');
             div.classList.add('day');
-            if (day == '') div.classList.add('disable');
-            if (day != '') div.onclick = () => { onSelect(day) };
-            div.innerText = day;
+            if (day == '') {
+                div.classList.add('disable');
+                div.innerText = day;
+            } else {
+                if (options.on && options.on.day && typeof options.on.day == 'function') {
+                    div.onclick = () => { options.on.day(day); };
+                }
+                let span = document.createElement('span');
+                span.innerText = day;
+                div.appendChild(span);
+                if (options['labels'] && typeof options['labels'] == 'object' && options['labels'][day] != null) {
+                    let label = options['labels'][day];
+                    let labels = document.createElement('div');
+                    labels.classList.add('labels');
+                    if (Array.isArray(label) == true) {
+                        for (let i in label) {
+                            labels.appendChild(createLabel(label[i]))
+                        }
+                    } else if (typeof label == 'string' || typeof label == 'object') {
+                        labels.appendChild(createLabel(label))
+                    }
+                    div.appendChild(labels);
+                }
+            }
             return div;
         }
+
+        function createLabel(label: any) {
+            let div = document.createElement('div');
+            div.classList.add('label');
+            if (typeof label == 'string') {
+                div.innerText = label;
+            }
+            else if (typeof label == 'object') {
+                div.innerText = label['text'] || '';
+                div.className += ' ' + label['class'];
+                if (label['value']) div.setAttribute('value', label['value']);
+            }
+            if (options.on && options.on.label && typeof options.on.label == 'function') {
+                div.onclick = () => {
+                    options.on.label(label);
+                }
+            }
+            return div;
+        }
+
         let array2D = Array(weeks).fill([]);
         for (let i = 0; i < array2D.length; i++) {
             array2D[i] = setWeek(i);
@@ -86,6 +134,7 @@ class Calendar {
             (<HTMLElement>document.querySelector(this.element)).appendChild(div);
         }
         return {
+            labels: options.labels || {},
             for: { year, month, Month: months[month - 1] || 'undefined', index: { first: start_index, last: end_index }, weeks, length: last_day },
             today: { year: currentDate.jYear(), month: currentDate.jMonth() + 1, Month: months[currentDate.jMonth()] || 'undefined', day },
             martix: { array: array2D, dom: div }

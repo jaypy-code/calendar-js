@@ -5,36 +5,34 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Document</title>
-    <script src="../dist/bundle.js"></script>
+    <title>Calendar JS | Example</title>
+    <script src="./bundle.js"></script>
+    <link rel="stylesheet" href="./style.css">
     <style>
-        div#calendar {
-            border: 1px solid #000;
-            width: calc(42px * 7);
+        /* Small */
+        @media only screen and (max-width: 600px) {
+            :root {
+                --box: 13vw;
+            }
         }
 
-        div.day {
-            width: 40px;
-            height: 40px;
-            border: 1px solid #000;
+        /* Medium */
+        @media only screen and (min-width: 600px) and (max-width: 992px) {
+            :root {
+                --box: 7vw;
+            }
         }
 
-        div.day.disable {
-            background-color: rgba(0, 0, 0, .2);
-        }
-
-        div.day:not(.disable) {
-            cursor: pointer;
-        }
-
-        div.week {
-            display: flex;
-            flex-wrap: nowrap;
+        @media only screen and (min-width: 993px) {
+            :root {
+                --box: 4vw;
+            }
         }
 
         div.info {
             text-align: left;
-            width: calc(42px * 7);
+            width: calc((var(--box) + 2px) * 7);
+            min-width: 250px;
         }
 
         header {
@@ -48,6 +46,12 @@
 
         header h3 {
             margin-top: 0;
+            margin-right: auto;
+        }
+
+        header span {
+            cursor: pointer;
+            text-decoration: underline;
         }
 
         header select {
@@ -84,34 +88,77 @@
         * {
             user-select: none;
         }
+
+        pre{
+            user-select: all;
+            cursor: text;
+            white-space: pre-wrap;
+        }
     </style>
 </head>
 
 <body>
     <header>
         <h3>Calendar JS</h3>
+        <span id="mode" onclick="changeMode()">View</span>
         <select id="months"></select>
     </header>
-    <section>
+    <section id="code" style="display: none;">
+    <pre>
+    &lt;link rel="stylesheet" href="https://raw.githubusercontent.com/jaypy-code/calendar-js/master/example/style.css" /&gt;
+    &lt;script src="https://raw.githubusercontent.com/jaypy-code/calendar-js/master/dist/bundle.js"&gt;&lt;/script&gt;
+    &lt;div id="calendar"&gt;&lt;/div&gt;
+    &lt;script&gt;
+        let calendar = new window.Calendar('#calendar');
+        let options = { 
+            year: <span ref="year"></span>,
+            month: <span ref="month"></span>,
+            on: { 
+                day: function(day='') {},
+                label: function(label={}) {}
+            },
+            labels: { 
+                '1': { text: 'First day of month', class: 'blue' },
+                '15': { text: 'New Label', class: 'red' }
+            }
+        };
+        calendar.make(options);
+    &lt;/script&gt;
+    </pre>
+    </section>
+    <section id="view">
         <div id="calendar"></div>
         <div class="info">
-            <p>Year: <span id="year"></span></p>
-            <p>Month: <span id="month"></span></p>
+            <p>Year: <span ref="year"></span></p>
+            <p>Month: <span ref="month"></span></p>
             <p>Month Name: <span id="Month"></span></p>
             <p>Weeks: <span id="weeks"></span></p>
             <p>Last Day: <span id="length"></span></p>
-            <p id="select">You didn`t select a day.</p>
+            <p id="select">You didn't select a day.</p>
         </div>
     </section>
     <footer>
-        <div class="hint">See your browser console!</div>
+        <div class="hint">See your browser's console!</div>
         <div class="link">
             <a id="time"></a>
-            <a href="">Source Code</a>
+            <a href="https://github.com/jaypy-code/calendar-js">Source Code</a>
         </div>
     </footer>
     <script>
         let calendar = new window.Calendar('#calendar');
+
+        function changeMode() {
+            let mode = document.getElementById('mode');
+            if (mode.innerText == 'View') { // show code
+                document.getElementById('code').removeAttribute('style');
+                document.getElementById('view').style.display = 'none';
+                mode.innerText = 'Code';
+            } else {
+                document.getElementById('view').removeAttribute('style');
+                document.getElementById('code').style.display = 'none';
+                mode.innerText = 'View';
+            }
+        }
 
         function makeMonths() {
             let months = calendar.months;
@@ -133,24 +180,28 @@
             if (document.querySelector('select#months option[selected]')) document.querySelector('select#months option[selected]').removeAttribute('selected');
             document.querySelector(`select#months option[value='${index}']`).setAttribute('selected', '');
         }
-        function callback(day) {
+        function onDaySelect(day) {
             document.getElementById('select').innerText = `You selected ${day}th day of this month.`
         }
-
+        function onLabelSelect(label) {
+            alert(label['text']);
+        }
         async function make(year = null, month = null) {
             let now = await Date.now();
-            document.getElementById('select').innerText = 'You didn`t select a day.';
-            let info = await calendar.make({ year, month }, callback)
+            document.getElementById('select').innerText = 'You didn\'t select a day.';
+            let options = { year, month, on: { day: onDaySelect, label: onLabelSelect }, labels: { '1': { text: 'First day of month', class: 'blue' }, '15': { text: 'New Label', class: 'red' } } };
+            let info = await calendar.make(options);
             console.clear();
             console.log(info);
             select(info['for']['month']);
-            document.getElementById('year').innerText = info['for']['year'];
-            document.getElementById('month').innerText = info['for']['month'];
+            document.querySelectorAll('span[ref="year"]').forEach(span=> span.innerText = info['for']['year']);
+            document.querySelectorAll('span[ref="month"]').forEach(span=> span.innerText = info['for']['month']);
             document.getElementById('Month').innerText = info['for']['Month'];
             document.getElementById('weeks').innerText = info['for']['weeks'];
             document.getElementById('length').innerText = info['for']['length'];
             document.getElementById('time').innerText = 'Build on ' + (Date.now() - now) + 'ms';
         }
+
 
         window.onload = () => {
             makeMonths();
