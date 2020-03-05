@@ -1,6 +1,6 @@
 {
   "name": "calandar-js",
-  "version": "0.0.1-beta",
+  "version": "0.0.2",
   "description": "Make simple calendar for jalaali calendars.",
   "main": "./dist/bundle.js",
   "scripts": {

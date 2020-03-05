@@ -18,7 +18,8 @@ export interface Options {
 
 class Calendar {
     public element: string;
-    public months = ["فروردین", "اردیبهشت", "خرداد", "تیر", "مرداد", "شهریور", "مهر", "آبان", "آذر", "دی", "بهمن", "اسفند"];
+    public months: string[] = ["فروردین", "اردیبهشت", "خرداد", "تیر", "مرداد", "شهریور", "مهر", "آبان", "آذر", "دی", "بهمن", "اسفند"];
+    public days: string[] = ['شنبه', 'یکشنبه', 'دوشنبه', 'سه شنبه', 'چهارشنبه', 'پنجشنبه', 'جمعه'];
     constructor(element: string = '') {
         if (!document.querySelector(element)) {
             console.log(new Error("Element not found!"));
@@ -36,6 +37,7 @@ class Calendar {
     }) {
         let
             months = this.months,
+            days = this.days,
             currentDate = await moment().locale('fa'), // today date
             year = options['year'] || currentDate.jYear(), // today year in jalali
             month = (options['month'] && typeof options['month'] == 'number' && 1 <= options['month'] && options['month'] <= 12) ? options['month'] : currentDate.jMonth() + 1, // today month in jalali
@@ -43,11 +45,11 @@ class Calendar {
             last_day = moment(`${year}/${month}/1`, 'jYYYY/jMM/jDD').endOf('jMonth').jDate(), // 30 or 31
             start_index = moment(`${year}/${month}/1`, 'jYYYY/jMM/jDD').weekday() + 1, // first day of month start is sunday, monday or ..
             end_index = moment(`${year}/${month}/${last_day}`, 'jYYYY/jMM/jDD').weekday() + 2, // last day of month (30 or 31) is sunday, monday or ..
-            weeks = 5,
+            weeks = 6,
             day_index = 1;
 
         if (start_index >= 5 && ((start_index == 6 && last_day >= 30) || (start_index == 5 && last_day == 31))) { // if first day of month start in 5th or 6th day of week change weeks in a month
-            weeks = 6;
+            weeks = 7;
         }
 
         let div = document.createElement('div');
@@ -55,6 +57,11 @@ class Calendar {
         function setWeek(index = 0) {
             let array = Array(7);
             if (index == 0) {
+                for (let i = 0; i < days.length; i++) {
+                    array[i] = days[i];
+                }
+            }
+            else if (index == 1) {
                 for (let i = 0; i < start_index; i++) {
                     array[i] = '';
                 }
@@ -63,12 +70,14 @@ class Calendar {
                     array[i] = '';
                 }
             }
-            for (let i = 0; i < 7; i++) {
-                if (array[i] != '' && day_index <= last_day) {
-                    array[i] = day_index;
-                    day_index++;
-                } else {
-                    array[i] = '';
+            if(index != 0){
+                for (let i = 0; i < 7; i++) {
+                    if (array[i] != '' && day_index <= last_day) {
+                        array[i] = day_index;
+                        day_index++;
+                    } else {
+                        array[i] = '';
+                    }
                 }
             }
             div.appendChild(createWeek(array));
@@ -87,7 +96,7 @@ class Calendar {
         function createDay(day: string = '') {
             let div = document.createElement('div');
             div.classList.add('day');
-            if (currentDate.jDate().toString() == day) div.classList.add('today');
+            if (currentDate.jDate().toString() == day && currentDate.jMonth() + 1 == month) div.classList.add('today');
             if (day == '') {
                 div.classList.add('disable');
                 div.innerText = day;
