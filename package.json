@@ -1,15 +1,21 @@
 {
   "name": "calandar-js",
   "version": "0.0.1",
-  "description": "",
+  "description": "Make simple calendar for jalaali calendars.",
   "main": "./dist/bundle.js",
   "scripts": {
     "build": "webpack",
     "serve": "http-serve ./example -c"
   },
-  "keywords": [],
+  "keywords": [
+    "calendar",
+    "moment",
+    "jalali",
+    "jaypy"
+  ],
   "author": "JayPY.Code <jaypy.code@gmail.com>",
   "license": "MIT",
+  "homepage": "https://github.com/jaypy-code/calendar-js",
   "dependencies": {
     "moment-jalaali": "^0.9.1"
   },
