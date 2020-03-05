@@ -6,6 +6,15 @@ declare global {
     }
 }
 
+export interface Options {
+    year?: string,
+    month?: string,
+    labels?: object,
+    on?: {
+        day: Function,
+        label: Function
+    }
+}
 
 class Calendar {
     public element: string;
@@ -19,7 +28,7 @@ class Calendar {
     async make(options: any = {
         year: null,
         month: null,
-        labels: { '1': [{ text: '1th', class: 'blue' }] },
+        labels: {},
         on: {
             day: (day: string) => { return day; },
             label: (label: object) => { return label; }
@@ -29,7 +38,7 @@ class Calendar {
             months = this.months,
             currentDate = await moment().locale('fa'), // today date
             year = options['year'] || currentDate.jYear(), // today year in jalali
-            month = (options['month'] && typeof options['month']=='number' && 1 <= options['month'] && options['month'] <= 12)?options['month'] : currentDate.jMonth() + 1, // today month in jalali
+            month = (options['month'] && typeof options['month'] == 'number' && 1 <= options['month'] && options['month'] <= 12) ? options['month'] : currentDate.jMonth() + 1, // today month in jalali
             day = currentDate.jDate(), // today date in jalali
             last_day = moment(`${year}/${month}/1`, 'jYYYY/jMM/jDD').endOf('jMonth').jDate(), // 30 or 31
             start_index = moment(`${year}/${month}/1`, 'jYYYY/jMM/jDD').weekday() + 1, // first day of month start is sunday, monday or ..
@@ -78,6 +87,7 @@ class Calendar {
         function createDay(day: string = '') {
             let div = document.createElement('div');
             div.classList.add('day');
+            if (currentDate.jDate().toString() == day) div.classList.add('today');
             if (day == '') {
                 div.classList.add('disable');
                 div.innerText = day;
