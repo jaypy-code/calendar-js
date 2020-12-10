@@ -1,4 +1,4 @@
-# Calendar-JS (version 0.0.1)
+# Calendar-JS (version 0.0.3)
 You can make simple calendar for jalali and able to choose years and months and a event emiter when user click on a day on the calander. It is free and opensource and please improve this library. You can use [demo](https://jaypy-code.github.io/calendar-js/example).
 
 # How to use
@@ -81,6 +81,8 @@ You can use returned values in .then function; this is what is returned:
 [6 Nov 2019] Set labels for days.
 
 [5 Nov 2019] Make simple calendar-js for jalali.
+
+[10 Dec 2020] Bug fixed 
 
 # Dependencies
 ```moment-jalaali^0.9.1```
