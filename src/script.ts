@@ -45,7 +45,7 @@ class Calendar {
             last_day = moment(`${year}/${month}/1`, 'jYYYY/jMM/jDD').endOf('jMonth').jDate(), // 30 or 31
             start_index = moment(`${year}/${month}/1`, 'jYYYY/jMM/jDD').weekday() + 1, // first day of month start is sunday, monday or ..
             end_index = moment(`${year}/${month}/${last_day}`, 'jYYYY/jMM/jDD').weekday() + 2, // last day of month (30 or 31) is sunday, monday or ..
-            weeks = 6,
+            weeks = 7,
             day_index = 1;
 
         if (start_index >= 5 && ((start_index == 6 && last_day >= 30) || (start_index == 5 && last_day == 31))) { // if first day of month start in 5th or 6th day of week change weeks in a month
@@ -70,7 +70,7 @@ class Calendar {
                     array[i] = '';
                 }
             }
-            if(index != 0){
+            if (index != 0) {
                 for (let i = 0; i < 7; i++) {
                     if (array[i] != '' && day_index <= last_day) {
                         array[i] = day_index;
@@ -80,8 +80,11 @@ class Calendar {
                     }
                 }
             }
-            div.appendChild(createWeek(array));
-            return array;
+
+            if (array.join() != ",,,,,,") {
+                div.appendChild(createWeek(array));
+                return array;
+            }
         }
 
         function createWeek(days: any[] = []) {
@@ -101,7 +104,7 @@ class Calendar {
                 div.classList.add('disable');
                 div.innerText = day;
             } else {
-                if (options.on && options.on.day && typeof options.on.day == 'function') {
+                if (options.on && options.on.day && typeof options.on.day == 'function' && Number(day)) {
                     div.onclick = () => { options.on.day(day); };
                 }
                 let span = document.createElement('span');
@@ -145,7 +148,9 @@ class Calendar {
 
         let array2D = Array(weeks).fill([]);
         for (let i = 0; i < array2D.length; i++) {
-            array2D[i] = setWeek(i);
+            let result = setWeek(i);
+            if (result)
+                array2D[i] = result;
         }
 
         if (document.querySelector(this.element)) {
